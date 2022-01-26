@@ -1,5 +1,9 @@
 # Import required packages
 import requests
+import json
+from spatialite_database import SpatialiteDatabase
+import sqlite3
+import csv
 
 
 def get_report(data_url_path):
@@ -129,9 +133,89 @@ def export_to_csv(data_url_path):
     print("Export finished")
 
 
+class Database(SpatialiteDatabase):
+    """
+    The Database class represents a Spatialite database for creating a database with data results.
+
+    Args:
+        spatialite_filepath (str):
+            File path of the Spatialite extension
+    """
+
+    def __init__(self, database_filepath, spatialite_filepath="mod_spatialite"):
+        SpatialiteDatabase.__init__(self, database_filepath, spatialite_filepath)
+
+    def create_tables(self):
+        """
+        Creates all necessary tables in the database. These are:
+            FlightData : Stores the Flight Data coming from the API.
+        """
+
+        # Create table FlightData
+        sql_statement = "CREATE TABLE FlightData ("
+        sql_statement += "id                        INTEGER PRIMARY KEY, "
+        sql_statement += "gender                    TEXT, "
+        sql_statement += "title                     TEXT, "
+        sql_statement += "first                     TEXT,"
+        sql_statement += "last                      TEXT, "
+        sql_statement += "street_number             INTEGER, "
+        sql_statement += "street_name               TEXT, "
+        sql_statement += "city                      TEXT, "
+        sql_statement += "state                     TEXT, "
+        sql_statement += "country                   TEXT, "
+        sql_statement += "postcode                  INTEGER, "
+        sql_statement += "latitude                  FLOAT, "
+        sql_statement += "longitude                 FLOAT, "
+        sql_statement += "timezone_offset           FLOAT, "
+        sql_statement += "timezone_description      TEXT, "
+        sql_statement += "email                     TEXT, "
+        sql_statement += "dob                       FLOAT, "
+        sql_statement += "age                       FLOAT, "
+        sql_statement += "id_name                   TEXT, "
+        sql_statement += "id_value                  TEXT, "
+        sql_statement += "picture_large             TEXT, "
+        sql_statement += "picture_medium            TEXT, "
+        sql_statement += "picture_thumbnail         TEXT, "
+        sql_statement += "nationality               TEXT)"
+        self.connection.execute(sql_statement)
+        print("Table District created")
+
+    def import_data(self, data_filepath):
+        """
+        Imports flight data from the given filepath.
+            data_filepath : File path to the Flight data.
+        """
+
+        # Read columns district, total population, male population, female population and number
+        # of households from input CSV file
+        print("Starting import")
+        file = open(data_filepath)
+        rows = csv.reader(file, delimiter=";")
+        next(rows, None) # Skip headers
+
+        # Insert the data to the PopulationDistribution table
+        sql_statement = "INSERT INTO FlightData (gender, title, first, last, street_number, street_name, " \
+                            "city,state, country,postcode, latitude,longitude, timezone_offset, " \
+                            "timezone_description,email, dob, age, id_name, id_value, picture_large, " \
+                            "picture_medium, picture_thumbnail, nationality) "
+        sql_statement += "VALUES (?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+        for row in rows:
+            self.cursor.execute(sql_statement, row)
+
+        self.connection.commit()
+        print("Flight data added")
+
+
 def main():
     # Path to data url
     data_url_path = "https://randomuser.me/api/?results=300&nat=de,dk,fr,gb&inc=id,gender,name,location,email,dob,picture,nat&seed=flightright"
+
+    # Path to CSV file
+    data_file_path = "/home/shinde/Documents/Personal/Applications/Flightright/FlightRightCodeTest/report_results.csv"
+
+    # Setup path to the database
+    db = Database("/home/shinde/Documents/Personal/Applications/Flightright/test.sqlite",
+                  '/usr/lib/x86_64-linux-gnu/mod_spatialite.so.7.1.0')
 
     option = None
     while option != "0":
@@ -142,6 +226,7 @@ def main():
         0 - Exit
         1 - Export data results to JSON file
         2 - Export data results to CSV file
+        3 - Export report results to a db
         """
         )
 
@@ -154,6 +239,20 @@ def main():
             export_to_json(data_url_path)
         elif option == "2":
             export_to_csv(data_url_path)
+        elif option == "3":
+            # Example logging output
+            print("Flight Database started")
+
+            db = Database("/home/shinde/Documents/Personal/Applications/Flightright/test.sqlite",
+                          '/usr/lib/x86_64-linux-gnu/mod_spatialite.so.7.1.0')
+
+            try:
+                db.connect()
+            except sqlite3.OperationalError:
+                print("Spatialite extension cannot be loaded. Exiting ...")
+                exit()
+            db.create_tables()
+            db.import_data(data_file_path)
         else:
             print(" ### Wrong option ### ")
 
