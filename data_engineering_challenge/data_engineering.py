@@ -227,6 +227,34 @@ def export_chart_country(data_file_path):
     plt.close()
 
 
+def export_chart_avg_age_by_country(data_file_path):
+    fight_data = pd.read_csv(data_file_path, sep=';')
+    fight_data_df = pd.DataFrame(fight_data)
+
+    # Group data for unique values of the country
+    fight_data_df.groupby([' country'])[' age'].mean().plot(linewidth=10)
+
+    plt.xlabel("Country")
+    plt.ylabel("Average Age observed for each country")
+    plt.title("Distribution of average age observed for each country")
+    plt.savefig('saved_figure_avg_age.png', dpi=300, bbox_inches = "tight")
+    plt.close()
+
+
+def export_chart_age_dist_by_country(data_file_path):
+    fight_data = pd.read_csv(data_file_path, sep=';')
+    fight_data_df = pd.DataFrame(fight_data)
+    sns.set_theme(style="ticks", palette="pastel")
+    # define figure size
+    sns.set(font_scale=1.2)
+    sns.boxplot(x=" country", y=" age",palette=["m", "g"], data=fight_data_df).set(xlabel='Country', ylabel='Age Distribution', title='Age distribution observed for each country'
+    )
+    # create pie chart
+    plt.savefig('age_distribution.png', dpi=300, bbox_inches = "tight")
+    plt.close()
+
+
+
 def main():
     # Path to data url
     data_url_path = "https://randomuser.me/api/?results=300&nat=de,dk,fr,gb&inc=id,gender,name,location,email,dob,picture,nat&seed=flightright"
@@ -249,6 +277,8 @@ def main():
         2 - Export data results to CSV file
         3 - Export report results to a db
         4 - Export statistics chart for each country
+        5 - Export statistics chart for average age of each country
+        6 - Export statistics chart for distribution of age for each country
         """
         )
 
@@ -277,6 +307,10 @@ def main():
             db.import_data(data_file_path)
         elif option == "4":
             export_chart_country(data_file_path)
+        elif option == "5":
+            export_chart_avg_age_by_country(data_file_path)
+        elif option == "6":
+            export_chart_age_dist_by_country(data_file_path)
         else:
             print(" ### Wrong option ### ")
 
