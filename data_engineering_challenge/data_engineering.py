@@ -254,6 +254,22 @@ def export_chart_age_dist_by_country(data_file_path):
     plt.close()
 
 
+def export_chart_gender_dist_by_country(data_file_path):
+    fight_data = pd.read_csv(data_file_path, sep=';')
+    fight_data_df = pd.DataFrame(fight_data)
+
+    # define font size
+    sns.set(font_scale=1.05)
+
+    # from raw value to percentage
+    plot_gender = sns.catplot(data=fight_data_df, kind='count', x=' country', hue='gender').set(title='Gender distribution in country')
+    plot_gender.set_xlabels('Country', fontsize=15)
+    plot_gender.set_ylabels("Count for each gender", size=14)
+
+    # create pie chart
+    plt.savefig('saved_figure_gender.png', dpi=300, bbox_inches = "tight")
+    plt.close()
+
 
 def main():
     # Path to data url
@@ -279,6 +295,7 @@ def main():
         4 - Export statistics chart for each country
         5 - Export statistics chart for average age of each country
         6 - Export statistics chart for distribution of age for each country
+        7 - Export statistics chart for count genders in each country
         """
         )
 
@@ -311,6 +328,8 @@ def main():
             export_chart_avg_age_by_country(data_file_path)
         elif option == "6":
             export_chart_age_dist_by_country(data_file_path)
+        elif option == "7":
+            export_chart_gender_dist_by_country(data_file_path)
         else:
             print(" ### Wrong option ### ")
 
