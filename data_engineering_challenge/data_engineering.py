@@ -312,9 +312,6 @@ def main():
             # Example logging output
             print("Flight Database started")
 
-            db = Database("/home/shinde/Documents/Personal/Applications/Flightright/test.sqlite",
-                          '/usr/lib/x86_64-linux-gnu/mod_spatialite.so.7.1.0')
-
             try:
                 db.connect()
             except sqlite3.OperationalError:
