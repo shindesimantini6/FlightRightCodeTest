@@ -1,0 +1,26 @@
+image: python:3.9
+
+# Make pip cache the installed dependencies
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python3 -V
+  - pip3 install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip3 install .
+  - pip3 install .[tests]
+
+linters:
+  script:
+    - pip3 install .[linters]
+    - make check
+
+tests:
+  script:
+    - pytest tests
