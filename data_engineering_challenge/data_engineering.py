@@ -210,6 +210,15 @@ class Database(SpatialiteDatabase):
 
 
 def export_chart_country(data_file_path):
+    """
+    Exports a pie chart with percentage of data for each country.
+
+    Args:
+    data_file_path (str):
+        File path of the exported CSV file
+    """
+
+    # Read csv as pandas dataframe
     fight_data = pd.read_csv(data_file_path, sep=';')
     fight_data_df = pd.DataFrame(fight_data)
 
@@ -218,20 +227,30 @@ def export_chart_country(data_file_path):
 
     # Plot and save a pie distribution
     labels = fight_data_df_group.index
-    # define Seaborn color palette to use
+
+    # Define Seaborn color palette to use
     colors = sns.color_palette('pastel')[0:5]
 
-    # create pie chart
+    # Create pie chart
     plt.pie(fight_data_df_group, labels=labels, colors=colors, autopct='%.0f%%')
     plt.savefig('saved_figure_country.png', dpi=300, bbox_inches = "tight")
     plt.close()
 
 
 def export_chart_avg_age_by_country(data_file_path):
+    """
+    Exports a line chart with average age observed for each country.
+
+    Args:
+    data_file_path (str):
+        File path of the exported CSV file
+    """
+
+    # Read csv as pandas dataframe
     fight_data = pd.read_csv(data_file_path, sep=';')
     fight_data_df = pd.DataFrame(fight_data)
 
-    # Group data for unique values of the country
+    # Group data for average age of each country and plot a line chart
     fight_data_df.groupby([' country'])[' age'].mean().plot(linewidth=10)
 
     plt.xlabel("Country")
@@ -242,31 +261,51 @@ def export_chart_avg_age_by_country(data_file_path):
 
 
 def export_chart_age_dist_by_country(data_file_path):
+    """
+    Exports a box plot age distribution observed for each country.
+
+    Args:
+    data_file_path (str):
+        File path of the exported CSV file
+    """
+
+    # Read csv as pandas dataframe
     fight_data = pd.read_csv(data_file_path, sep=';')
     fight_data_df = pd.DataFrame(fight_data)
+
     sns.set_theme(style="ticks", palette="pastel")
-    # define figure size
+
+    # Define figure size
     sns.set(font_scale=1.2)
-    sns.boxplot(x=" country", y=" age",palette=["m", "g"], data=fight_data_df).set(xlabel='Country', ylabel='Age Distribution', title='Age distribution observed for each country'
-    )
-    # create pie chart
+
+    # Create a boxplot
+    sns.boxplot(x=" country", y=" age",palette=["m", "g"], data=fight_data_df).set(xlabel='Country', ylabel='Age Distribution', title='Age distribution observed for each country')
+
     plt.savefig('age_distribution.png', dpi=300, bbox_inches = "tight")
     plt.close()
 
 
 def export_chart_gender_dist_by_country(data_file_path):
+    """
+    Exports a cat plot with distribution of gender observed for each country.
+
+    Args:
+    data_file_path (str):
+        File path of the exported CSV file
+    """
+
+    # Read csv as pandas dataframe
     fight_data = pd.read_csv(data_file_path, sep=';')
     fight_data_df = pd.DataFrame(fight_data)
 
-    # define font size
+    # Define font size
     sns.set(font_scale=1.05)
 
-    # from raw value to percentage
+    # Plot a catplot for distribution of gender in each country
     plot_gender = sns.catplot(data=fight_data_df, kind='count', x=' country', hue='gender').set(title='Gender distribution in country')
+
     plot_gender.set_xlabels('Country', fontsize=15)
     plot_gender.set_ylabels("Count for each gender", size=14)
-
-    # create pie chart
     plt.savefig('saved_figure_gender.png', dpi=300, bbox_inches = "tight")
     plt.close()
 
