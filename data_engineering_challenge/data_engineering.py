@@ -4,6 +4,9 @@ import json
 from spatialite_database import SpatialiteDatabase
 import sqlite3
 import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def get_report(data_url_path):
@@ -206,6 +209,24 @@ class Database(SpatialiteDatabase):
         print("Flight data added")
 
 
+def export_chart_country(data_file_path):
+    fight_data = pd.read_csv(data_file_path, sep=';')
+    fight_data_df = pd.DataFrame(fight_data)
+
+    # Group data for unique values of the country
+    fight_data_df_group = fight_data_df.groupby([' country'])[' country'].count()
+
+    # Plot and save a pie distribution
+    labels = fight_data_df_group.index
+    # define Seaborn color palette to use
+    colors = sns.color_palette('pastel')[0:5]
+
+    # create pie chart
+    plt.pie(fight_data_df_group, labels=labels, colors=colors, autopct='%.0f%%')
+    plt.savefig('saved_figure_country.png', dpi=300, bbox_inches = "tight")
+    plt.close()
+
+
 def main():
     # Path to data url
     data_url_path = "https://randomuser.me/api/?results=300&nat=de,dk,fr,gb&inc=id,gender,name,location,email,dob,picture,nat&seed=flightright"
@@ -227,6 +248,7 @@ def main():
         1 - Export data results to JSON file
         2 - Export data results to CSV file
         3 - Export report results to a db
+        4 - Export statistics chart for each country
         """
         )
 
@@ -253,6 +275,8 @@ def main():
                 exit()
             db.create_tables()
             db.import_data(data_file_path)
+        elif option == "4":
+            export_chart_country(data_file_path)
         else:
             print(" ### Wrong option ### ")
 
