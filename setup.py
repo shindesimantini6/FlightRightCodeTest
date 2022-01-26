@@ -18,6 +18,6 @@ setup(
     extras_require={"tests": tests_require, "linters": linters_require},
     packages=find_packages(),
     entry_points={"console_scripts": ["data_engineering_challenge = "
-                                      "data_engineering_challenge.data_engineering_challenge:main"]},
+                                      "data_engineering_challenge.data_engineering:main"]},
     python_requires=">=3.6",
 )

@@ -1,4 +1,4 @@
-SOURCES=exposurejapan tests setup.py
+SOURCES=data_engineering tests setup.py
 LENGTH=96
 
 check: $(SOURCES)
